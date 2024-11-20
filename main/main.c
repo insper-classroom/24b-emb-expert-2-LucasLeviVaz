@@ -69,56 +69,56 @@ data from the chip to something usable. Each chip has a different set of
 compensation parameters stored on the chip at point of manufacture, which are
 read from the chip at startup and used in these routines.
 */
-int32_t compensate_temp(int32_t adc_T) {
-    int32_t var1, var2, T;
-    var1 = ((((adc_T >> 3) - ((int32_t) dig_T1 << 1))) * ((int32_t) dig_T2)) >> 11;
-    var2 = (((((adc_T >> 4) - ((int32_t) dig_T1)) * ((adc_T >> 4) - ((int32_t) dig_T1))) >> 12) * ((int32_t) dig_T3))
-            >> 14;
+// int32_t compensate_temp(int32_t adc_T) {
+//     int32_t var1, var2, T;
+//     var1 = ((((adc_T >> 3) - ((int32_t) dig_T1 << 1))) * ((int32_t) dig_T2)) >> 11;
+//     var2 = (((((adc_T >> 4) - ((int32_t) dig_T1)) * ((adc_T >> 4) - ((int32_t) dig_T1))) >> 12) * ((int32_t) dig_T3))
+//             >> 14;
 
-    t_fine = var1 + var2;
-    T = (t_fine * 5 + 128) >> 8;
-    return T;
-}
+//     t_fine = var1 + var2;
+//     T = (t_fine * 5 + 128) >> 8;
+//     return T;
+// }
 
-uint32_t compensate_pressure(int32_t adc_P) {
-    int32_t var1, var2;
-    uint32_t p;
-    var1 = (((int32_t) t_fine) >> 1) - (int32_t) 64000;
-    var2 = (((var1 >> 2) * (var1 >> 2)) >> 11) * ((int32_t) dig_P6);
-    var2 = var2 + ((var1 * ((int32_t) dig_P5)) << 1);
-    var2 = (var2 >> 2) + (((int32_t) dig_P4) << 16);
-    var1 = (((dig_P3 * (((var1 >> 2) * (var1 >> 2)) >> 13)) >> 3) + ((((int32_t) dig_P2) * var1) >> 1)) >> 18;
-    var1 = ((((32768 + var1)) * ((int32_t) dig_P1)) >> 15);
-    if (var1 == 0)
-        return 0;
+// uint32_t compensate_pressure(int32_t adc_P) {
+//     int32_t var1, var2;
+//     uint32_t p;
+//     var1 = (((int32_t) t_fine) >> 1) - (int32_t) 64000;
+//     var2 = (((var1 >> 2) * (var1 >> 2)) >> 11) * ((int32_t) dig_P6);
+//     var2 = var2 + ((var1 * ((int32_t) dig_P5)) << 1);
+//     var2 = (var2 >> 2) + (((int32_t) dig_P4) << 16);
+//     var1 = (((dig_P3 * (((var1 >> 2) * (var1 >> 2)) >> 13)) >> 3) + ((((int32_t) dig_P2) * var1) >> 1)) >> 18;
+//     var1 = ((((32768 + var1)) * ((int32_t) dig_P1)) >> 15);
+//     if (var1 == 0)
+//         return 0;
 
-    p = (((uint32_t) (((int32_t) 1048576) - adc_P) - (var2 >> 12))) * 3125;
-    if (p < 0x80000000)
-        p = (p << 1) / ((uint32_t) var1);
-    else
-        p = (p / (uint32_t) var1) * 2;
+//     p = (((uint32_t) (((int32_t) 1048576) - adc_P) - (var2 >> 12))) * 3125;
+//     if (p < 0x80000000)
+//         p = (p << 1) / ((uint32_t) var1);
+//     else
+//         p = (p / (uint32_t) var1) * 2;
 
-    var1 = (((int32_t) dig_P9) * ((int32_t) (((p >> 3) * (p >> 3)) >> 13))) >> 12;
-    var2 = (((int32_t) (p >> 2)) * ((int32_t) dig_P8)) >> 13;
-    p = (uint32_t) ((int32_t) p + ((var1 + var2 + dig_P7) >> 4));
+//     var1 = (((int32_t) dig_P9) * ((int32_t) (((p >> 3) * (p >> 3)) >> 13))) >> 12;
+//     var2 = (((int32_t) (p >> 2)) * ((int32_t) dig_P8)) >> 13;
+//     p = (uint32_t) ((int32_t) p + ((var1 + var2 + dig_P7) >> 4));
 
-    return p;
-}
+//     return p;
+// }
 
-uint32_t compensate_humidity(int32_t adc_H) {
-    int32_t v_x1_u32r;
-    v_x1_u32r = (t_fine - ((int32_t) 76800));
-    v_x1_u32r = (((((adc_H << 14) - (((int32_t) dig_H4) << 20) - (((int32_t) dig_H5) * v_x1_u32r)) +
-                   ((int32_t) 16384)) >> 15) * (((((((v_x1_u32r * ((int32_t) dig_H6)) >> 10) * (((v_x1_u32r *
-                                                                                                  ((int32_t) dig_H3))
-            >> 11) + ((int32_t) 32768))) >> 10) + ((int32_t) 2097152)) *
-                                                 ((int32_t) dig_H2) + 8192) >> 14));
-    v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((int32_t) dig_H1)) >> 4));
-    v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
-    v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
+// uint32_t compensate_humidity(int32_t adc_H) {
+//     int32_t v_x1_u32r;
+//     v_x1_u32r = (t_fine - ((int32_t) 76800));
+//     v_x1_u32r = (((((adc_H << 14) - (((int32_t) dig_H4) << 20) - (((int32_t) dig_H5) * v_x1_u32r)) +
+//                    ((int32_t) 16384)) >> 15) * (((((((v_x1_u32r * ((int32_t) dig_H6)) >> 10) * (((v_x1_u32r *
+//                                                                                                   ((int32_t) dig_H3))
+//             >> 11) + ((int32_t) 32768))) >> 10) + ((int32_t) 2097152)) *
+//                                                  ((int32_t) dig_H2) + 8192) >> 14));
+//     v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((int32_t) dig_H1)) >> 4));
+//     v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
+//     v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
 
-    return (uint32_t) (v_x1_u32r >> 12);
-}
+//     return (uint32_t) (v_x1_u32r >> 12);
+// }
 
 #ifdef PICO_DEFAULT_SPI_CSN_PIN
 static inline void cs_select() {
